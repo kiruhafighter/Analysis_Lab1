@@ -3,10 +3,15 @@ using MathNet.Numerics.Statistics;
 
 namespace Analysis_Lab1.DataProcessors
 {
-    public static class TableVisualProcessor
+    public static class DataProcessor
     {
-        public static void GenerateVariationSeries(List<double> data)
+        public static List<DataPoint>? GenerateVariationSeries(List<double> data)
         {
+            if (data.Count < 1)
+            {
+                return null;
+            }
+
             int i = 0;
 
             var variationSeries = data
@@ -21,12 +26,7 @@ namespace Analysis_Lab1.DataProcessors
                     EmpiricalDistribution = Statistics.EmpiricalCDF(data, group.Key)
                 }).ToList();
 
-            Console.WriteLine("Number\tValue\t\tFrequensy\tRelative Frequency\tEmpirical Distribution");
-
-            foreach (var entry in variationSeries)
-            {
-                Console.WriteLine($"{entry.Id}\t{entry.Value} \t  {entry.Frequency}\t\t\t{entry.RelativeFrequency}\t\t{entry.EmpiricalDistribution:P2}");
-            }
+            return variationSeries;
         }
     }
 }
