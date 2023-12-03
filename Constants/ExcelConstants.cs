@@ -1,12 +1,12 @@
 ﻿namespace Analysis_Lab1.Constants;
 
-internal struct ExcelConstants
+public struct ExcelConstants
 {
-    internal const int ColumnMaxWidth = 25;
+    public const int ColumnMaxWidth = 20;
     
-    internal const int ColumnStartIndex = 1;
+    public const int ColumnStartIndex = 1;
     
-    internal const int RowStartIndex = 1;
+    public const int RowStartIndex = 1;
     
-    internal const int RowDataStartIndex = 2;
+    public const int RowDataStartIndex = 2;
 }

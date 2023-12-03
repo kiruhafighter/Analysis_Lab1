@@ -44,7 +44,7 @@ public static class SLDocumentExtensions<TEnum>
         sl.SetCellStyle(ExcelConstants.RowStartIndex, ExcelConstants.ColumnStartIndex, 
             ExcelConstants.RowStartIndex, enumValues.Length, style);
 
-        sl.FreezePanes(2, 0);
+        sl.FreezePanes(1, 2);
         sl.ProtectWorksheet(new SLSheetProtection());
     }
 }

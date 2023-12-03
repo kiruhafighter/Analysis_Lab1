@@ -4,12 +4,13 @@ using SpreadsheetLight;
 
 namespace Analysis_Lab1.Utilities;
 
-internal static class ExcelProcessor
+public static class ExcelProcessor
 {
-    internal static void SaveAsExcel<T, TEnum>(IList<T> items, string savePath)
+    public static void SaveAsExcel<T, TEnum>(IList<T> items, string savePath)
         where TEnum : Enum
     {
         using var sl = new SLDocument();
+        
         SLDocumentExtensions<TEnum>.ApplyExcelConfiguration(sl);
         
         var rowIndex = ExcelConstants.RowDataStartIndex;
@@ -17,6 +18,7 @@ internal static class ExcelProcessor
         foreach (var item in items)
         {
             var enumColumns = Enum.GetValues(typeof(TEnum));
+            
             var columnIndex = ExcelConstants.ColumnStartIndex;
 
             foreach (TEnum column in enumColumns)

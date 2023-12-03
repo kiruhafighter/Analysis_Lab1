@@ -3,4 +3,6 @@
 internal struct FilePaths
 {
     internal const string SaveVariationSeriesPath = @"C:\Users\kiruhafighter\Desktop\VariationSeries.xlsx";
+    
+    internal const string SaveClassIntervalPath = @"C:\Users\kiruhafighter\Desktop\ClassInterval.xlsx";
 }

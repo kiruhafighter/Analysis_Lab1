@@ -1,10 +1,9 @@
 ﻿using Analysis_Lab1.Enums;
 
 namespace Analysis_Lab1.Extensions;
-
-internal static class EnumExtensions
+public static class EnumExtensions
 {
-    internal static string GetDisplayName(this Enum value)
+    public static string GetDisplayName(this Enum value)
     {
         var fieldInfo = value.GetType().GetField(value.ToString());
 

@@ -1,45 +1,44 @@
-﻿namespace Analysis_Lab1.Utilities
+﻿namespace Analysis_Lab1.Utilities;
+
+public static class DataReader
 {
-    internal static class DataReader
+    public static List<double>? LoadDataFromFile(string fileName)
     {
-        internal static List<double>? LoadDataFromFile(string fileName)
+        if (!File.Exists(fileName)) 
         {
-            if (!File.Exists(fileName)) 
+            Console.WriteLine("File does not exist.");
+            return null;
+        }
+
+        List<double> values = new List<double>();
+
+        try
+        {
+            string[] lines = File.ReadAllLines(fileName);
+
+            foreach(string line in lines)
             {
-                Console.WriteLine("Files does not exist.");
-                return null;
-            }
+                string[] numbers = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
 
-            List<double> values = new List<double>();
-
-            try
-            {
-                string[] lines = File.ReadAllLines(fileName);
-
-                foreach(string line in lines)
+                foreach(string number in numbers)
                 {
-                    string[] numbers = line.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-
-                    foreach(string number in numbers)
+                    if (double.TryParse(number, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
                     {
-                        if (double.TryParse(number, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture, out double parsedValue))
-                        {
-                            values.Add(parsedValue);
-                        }
-                        else
-                        {
-                            Console.WriteLine($"Error occured when parsing {number}.");
-                        }
+                        values.Add(parsedValue);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Error occured when parsing {number}.");
                     }
                 }
             }
-            catch(Exception ex)
-            {
-                Console.WriteLine($"Error loading data from file: {ex.Message}");
-                return null;
-            }
-
-            return values;
         }
+        catch(Exception ex)
+        {
+            Console.WriteLine($"Error loading data from file: {ex.Message}");
+            return null;
+        }
+
+        return values;
     }
 }
