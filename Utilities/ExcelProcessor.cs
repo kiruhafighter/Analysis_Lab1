@@ -76,18 +76,29 @@ public static class ExcelProcessor
         chart.SetSize(600, 400);
         
         // Set chart data range
-        chart.Series.Add(worksheet.Cells["D2:D" + (classIntervals.Count + 1)], worksheet.Cells["A2:A" + (classIntervals.Count + 1)]);
+        chart.Series.Add(worksheet.Cells["D2:D" + (classIntervals.Count + 1)],
+            worksheet.Cells["A2:A" + (classIntervals.Count + 1)]);
 
         #region KDE
 
+        SetKDEChart(variationSeries, bandwidth, worksheet);
+
+        #endregion
+        
+        package.SaveAs(new FileInfo(savePath));
+    }
+
+    private static void SetKDEChart(List<DataPoint> variationSeries, double bandwidth, ExcelWorksheet worksheet)
+    {
         if (bandwidth <= 0.0)
         {
             // If bandwidth is not specified, calculate it using Scott's rule
-            bandwidth = Statistics.StandardDeviation(variationSeries.Select(dp => dp.Value)) * Math.Pow(variationSeries.Count, -1.0 / 5.0) * 1.06;
+            bandwidth = Statistics.StandardDeviation(variationSeries.Select(dp => dp.Value)) *
+                        Math.Pow(variationSeries.Count, -1.0 / 5.0) * 1.06;
         }
 
         var kdePoints = StatisticsAnalyzer.GenerateKDEPoints(variationSeries, bandwidth);
-        
+
         for (int i = 0; i < kdePoints.Count; i++)
         {
             worksheet.Cells[i + 2, 6].Value = kdePoints[i].Value;
@@ -95,16 +106,13 @@ public static class ExcelProcessor
         }
 
         // var kdeLine = chart.PlotArea.ChartTypes.Add(eChartType.Line);
-        
+
         var kdeChart = worksheet.Drawings.AddChart("KDEChart", eChartType.Line);
-        
+
         kdeChart.SetPosition(22, 0, 9, 0);
         kdeChart.SetSize(600, 400);
 
-        kdeChart.Series.Add(worksheet.Cells["G2:G" + (kdePoints.Count + 1)], worksheet.Cells["F2:F" + (kdePoints.Count + 1)]);
-
-        #endregion
-        
-        package.SaveAs(new FileInfo(savePath));
+        kdeChart.Series.Add(worksheet.Cells["G2:G" + (kdePoints.Count + 1)],
+            worksheet.Cells["F2:F" + (kdePoints.Count + 1)]);
     }
 }
