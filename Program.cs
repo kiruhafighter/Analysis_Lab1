@@ -15,6 +15,8 @@ var variationSeries = DataProcessor.GenerateVariationSeries(values);
 
 ExcelProcessor.SaveAsExcel<DataPoint, VariationSeriesColumns>(variationSeries, FilePaths.SaveVariationSeriesPath);
 
-var classIntervals = StatisticsAnalyzer.DivideIntoClasses(variationSeries, 200);
+var classIntervals = StatisticsAnalyzer.DivideIntoClasses(variationSeries);
 
 ExcelProcessor.SaveAsExcel<ClassInterval, ClassIntervalColumns>(classIntervals!, FilePaths.SaveClassIntervalPath);
+
+ExcelProcessor.SaveClassesAsHistogram(classIntervals!, variationSeries, FilePaths.SaveClassIntervalHistogramPath);

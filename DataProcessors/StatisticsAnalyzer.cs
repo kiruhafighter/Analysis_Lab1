@@ -1,10 +1,14 @@
-﻿using Analysis_Lab1.Entities;
+﻿using Accord.Statistics.Distributions.DensityKernels;
+using Analysis_Lab1.Entities;
+using MathNet.Numerics.Distributions;
+using MathNet.Numerics.Statistics;
+using OfficeOpenXml.Drawing.Chart;
 
 namespace Analysis_Lab1.DataProcessors;
 
 public static class StatisticsAnalyzer
 {
-    public static List<ClassInterval>? DivideIntoClasses(List<DataPoint> variationSeries, int? numberOfClasses)
+    public static List<ClassInterval>? DivideIntoClasses(List<DataPoint> variationSeries, int? numberOfClasses = null)
     {
         var dataSize = variationSeries.Count;
         
@@ -60,5 +64,25 @@ public static class StatisticsAnalyzer
         }
 
         return dividedClasses;
+    }
+
+    public static List<DataPoint> GenerateKDEPoints(List<DataPoint> variationSeries, double bandwidth)
+    {
+        var kdePoints = new List<DataPoint>();
+
+        foreach (var dataPoint in variationSeries)
+        {
+            var kernel = new Normal(dataPoint.Value, bandwidth);
+
+            var kdeValue = variationSeries.Select(dp => kernel.Density(dp.Value) * dp.RelativeFrequency).Sum();
+
+            kdePoints.Add(new DataPoint
+            {
+                Value = dataPoint.Value,
+                EmpiricalDistribution = kdeValue
+            });
+        }
+
+        return kdePoints;
     }
 }
