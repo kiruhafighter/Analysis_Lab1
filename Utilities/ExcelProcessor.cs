@@ -1,5 +1,4 @@
-﻿using Accord.Extensions;
-using Analysis_Lab1.Constants;
+﻿using Analysis_Lab1.Constants;
 using Analysis_Lab1.DataProcessors;
 using Analysis_Lab1.Entities;
 using Analysis_Lab1.Extensions;
@@ -36,7 +35,11 @@ public static class ExcelProcessor
                 if (property is not null)
                 {
                     var cellValue = property.GetValue(item)?.ToString();
-                    sl.SetCellValue(rowIndex, columnIndex, cellValue);
+
+                    if (cellValue is not null)
+                    {
+                        sl.SetCellValue(rowIndex, columnIndex, cellValue);
+                    }
                 }
 
                 columnIndex++;
@@ -60,6 +63,7 @@ public static class ExcelProcessor
         worksheet.Cells["D1"].Value = "Frequency";
         worksheet.Cells["F1"].Value = "Value";
         worksheet.Cells["G1"].Value = "KDE Value";
+        worksheet.Cells["H1"].Value = "EDF Value";
 
         // Write data
         for (int i = 0; i < classIntervals.Count; i++)
@@ -80,9 +84,11 @@ public static class ExcelProcessor
             worksheet.Cells["A2:A" + (classIntervals.Count + 1)]);
 
         #region KDE
-
         SetKDEChart(variationSeries, bandwidth, worksheet);
+        #endregion
 
+        #region EDF
+        SetEDFGraph(variationSeries, worksheet);
         #endregion
         
         package.SaveAs(new FileInfo(savePath));
@@ -114,5 +120,23 @@ public static class ExcelProcessor
 
         kdeChart.Series.Add(worksheet.Cells["G2:G" + (kdePoints.Count + 1)],
             worksheet.Cells["F2:F" + (kdePoints.Count + 1)]);
+    }
+    
+    private static void SetEDFGraph(List<DataPoint> variationSeries, ExcelWorksheet worksheet)
+    {
+        for (int i = 0; i < variationSeries.Count; i++)
+        {
+            worksheet.Cells[i + 2, 8].Value = variationSeries[i].EmpiricalDistribution;
+        }
+
+        // var kdeLine = chart.PlotArea.ChartTypes.Add(eChartType.Line);
+
+        var edfGraph = worksheet.Drawings.AddChart("EDFGraph", eChartType.XYScatterLines);
+
+        edfGraph.SetPosition(44, 0, 9, 0);
+        edfGraph.SetSize(600, 400);
+
+        edfGraph.Series.Add(worksheet.Cells["H2:H" + (variationSeries.Count + 1)],
+            worksheet.Cells["F2:F" + (variationSeries.Count + 1)]);
     }
 }

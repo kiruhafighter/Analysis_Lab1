@@ -4,7 +4,7 @@ using Analysis_Lab1.Entities;
 using Analysis_Lab1.Enums;
 using Analysis_Lab1.Utilities;
 
-var values = DataReader.LoadDataFromFile(@"C:\Users\kiruhafighter\Downloads\data_lab1,2 1\data_lab1,2\200\EXTR.DAT");
+var values = DataReader.LoadDataFromFile(@"C:\Users\Kirill-PC2\Downloads\data_lab1,2 1\data_lab1,2\500\EXP.TXT");
 
 if (values == null)
 {
@@ -20,3 +20,7 @@ var classIntervals = StatisticsAnalyzer.DivideIntoClasses(variationSeries);
 ExcelProcessor.SaveAsExcel<ClassInterval, ClassIntervalColumns>(classIntervals!, FilePaths.SaveClassIntervalPath);
 
 ExcelProcessor.SaveClassesAsHistogram(classIntervals!, variationSeries, FilePaths.SaveClassIntervalHistogramPath);
+
+var analysisCharacteristics = DataProcessor.EstimateQuantitativeCharacteristics(values);
+
+ExcelProcessor.SaveAsExcel<CharacteristicAnalysisResult, AnalysisResultColumns>(analysisCharacteristics, FilePaths.SaveAnalysisCharacteristicsPath);

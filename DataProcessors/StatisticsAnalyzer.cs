@@ -39,6 +39,13 @@ public static class StatisticsAnalyzer
                 .Where(dp => dp.Value >= lowerBound && dp.Value < upperBound)
                 .ToList();
 
+            if (i == numberOfClasses)
+            {
+                var lastElements = variationSeries.Where(vs => vs.Value.Equals(upperBound));
+                
+                dataPointsInClass.AddRange(lastElements);
+            }
+
             int frequency = dataPointsInClass.Sum(dp => dp.Frequency);
             double relativeFrequency = (double)frequency / dataSize;
             
