@@ -1,8 +1,5 @@
-﻿using Accord.Statistics.Distributions.DensityKernels;
-using Analysis_Lab1.Entities;
+﻿using Analysis_Lab1.Entities;
 using MathNet.Numerics.Distributions;
-using MathNet.Numerics.Statistics;
-using OfficeOpenXml.Drawing.Chart;
 
 namespace Analysis_Lab1.DataProcessors;
 
@@ -75,17 +72,26 @@ public static class StatisticsAnalyzer
 
     public static List<DataPoint> GenerateKDEPoints(List<DataPoint> variationSeries, double bandwidth)
     {
+        if (variationSeries == null || !variationSeries.Any())
+            throw new ArgumentException("Variation series must not be null or empty.");
+
+        if (bandwidth <= 0)
+            throw new ArgumentException("Bandwidth must be greater than zero.");
+
         var kdePoints = new List<DataPoint>();
 
-        foreach (var dataPoint in variationSeries)
+        foreach (var evaluationPoint in variationSeries)
         {
-            var kernel = new Normal(dataPoint.Value, bandwidth);
-
-            var kdeValue = variationSeries.Select(dp => kernel.Density(dp.Value) * dp.RelativeFrequency).Sum();
+            double kdeValue = 0;
+            foreach (var dataPoint in variationSeries)
+            {
+                var kernel = new Normal(dataPoint.Value, bandwidth);
+                kdeValue += kernel.Density(evaluationPoint.Value) * dataPoint.RelativeFrequency;
+            }
 
             kdePoints.Add(new DataPoint
             {
-                Value = dataPoint.Value,
+                Value = evaluationPoint.Value,
                 EmpiricalDistribution = kdeValue
             });
         }

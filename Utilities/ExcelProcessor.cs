@@ -50,6 +50,70 @@ public static class ExcelProcessor
         
         sl.SaveAs(savePath);
     }
+    
+    public static void DisplayProbabilityPlotInExcel((double[], double[]) probabilityPlotData, string filePath)
+    {
+        double[] expectedQuantiles = probabilityPlotData.Item1;
+        double[] sortedData = probabilityPlotData.Item2;
+        
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("ProbabilityPlot");
+            
+            for (int i = 0; i < sortedData.Length; i++)
+            {
+                worksheet.Cells[i + 2, 1].Value = expectedQuantiles[i];
+                worksheet.Cells[i + 2, 2].Value = sortedData[i];
+            }
+
+            // Create a scatter plot in the worksheet
+            var scatterChart = worksheet.Drawings.AddChart("ProbabilityPlot", eChartType.XYScatterLines);
+            scatterChart.Title.Text = "Probability Plot";
+            scatterChart.SetPosition(0, 0, 4, 0);
+            scatterChart.SetSize(600, 400);
+            scatterChart.XAxis.Title.Text = "Expected Quantiles (from Normal Distribution)";
+            scatterChart.YAxis.Title.Text = "Sorted Data Quantiles";
+
+            var series = scatterChart.Series.Add(worksheet.Cells["A2:A" + (sortedData.Length + 1)], worksheet.Cells["B2:B" + (sortedData.Length + 1)]);
+            series.Header = "Probability Plot";
+            
+            package.SaveAs(new FileInfo(filePath));
+        }
+    }
+    
+    public static void DisplayDataWithBoundsInExcel(List<double> data, double lowerBound, double upperBound, string filePath)
+    {
+        int[] indices = Enumerable.Range(1, data.Count).ToArray();
+        double[] values = data.ToArray();
+        
+        using (var package = new ExcelPackage())
+        {
+            var worksheet = package.Workbook.Worksheets.Add("DataPlot");
+
+            for (int i = 0; i < indices.Length; i++)
+            {
+                worksheet.Cells[i + 2, 1].Value = indices[i]; // Index
+                worksheet.Cells[i + 2, 2].Value = values[i];  // Data value
+            }
+
+            // Create a scatter plot in the worksheet
+            var scatterChart = worksheet.Drawings.AddChart("DataPlot", eChartType.XYScatterLines);
+            scatterChart.Title.Text = "Data Plot";
+            scatterChart.SetPosition(0, 0, 4, 0);
+            scatterChart.SetSize(600, 400);
+            scatterChart.XAxis.Title.Text = "Index";
+            scatterChart.YAxis.Title.Text = "Data Value";
+
+            var series = scatterChart.Series.Add(worksheet.Cells["A2:A" + (indices.Length + 1)], worksheet.Cells["B2:B" + (indices.Length + 1)]);
+            series.Header = "Data Values";
+
+            // Adding lines for lower and upper bounds
+            AddBoundLine(worksheet, scatterChart, lowerBound, indices.Length, "Lower Bound", 3);
+            AddBoundLine(worksheet, scatterChart, upperBound, indices.Length, "Upper Bound", 4);
+
+            package.SaveAs(new FileInfo(filePath));
+        }
+    }
 
     public static void SaveClassesAsHistogram(List<ClassInterval> classIntervals, List<DataPoint> variationSeries, 
         string savePath,  double bandwidth = 0.0)
@@ -113,7 +177,7 @@ public static class ExcelProcessor
 
         // var kdeLine = chart.PlotArea.ChartTypes.Add(eChartType.Line);
 
-        var kdeChart = worksheet.Drawings.AddChart("KDEChart", eChartType.Line);
+        var kdeChart = worksheet.Drawings.AddChart("KDEChart", eChartType.XYScatterLines);
 
         kdeChart.SetPosition(22, 0, 9, 0);
         kdeChart.SetSize(600, 400);
@@ -138,5 +202,24 @@ public static class ExcelProcessor
 
         edfGraph.Series.Add(worksheet.Cells["H2:H" + (variationSeries.Count + 1)],
             worksheet.Cells["F2:F" + (variationSeries.Count + 1)]);
+    }
+    
+    private static void AddBoundLine(ExcelWorksheet worksheet, ExcelChart scatterChart, double bound, int length, string seriesName, int boundColumn)
+    {
+        // Adding a column for bound values
+        for (int i = 1; i <= length; i++)
+        {
+            worksheet.Cells[i + 1, boundColumn].Value = bound;
+        }
+
+        // The address for the X-values (indices)
+        string xAddress = ExcelRange.GetAddress(2, 1, length + 1, 1); // "A2:A{length+1}"
+
+        // The address for the Y-values (constant bound)
+        string yAddress = ExcelRange.GetAddress(2, boundColumn, length + 1, boundColumn); // "C2:C{length+1}"
+
+        // Adding the series for the bound line
+        var boundSeries = scatterChart.Series.Add(yAddress, xAddress);
+        boundSeries.Header = seriesName;
     }
 }

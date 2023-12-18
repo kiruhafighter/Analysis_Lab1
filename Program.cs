@@ -4,7 +4,7 @@ using Analysis_Lab1.Entities;
 using Analysis_Lab1.Enums;
 using Analysis_Lab1.Utilities;
 
-var values = DataReader.LoadDataFromFile(@"C:\Users\Kirill-PC2\Downloads\data_lab1,2 1\data_lab1,2\500\EXP.TXT");
+var values = DataReader.LoadDataFromFile(@"C:\Users\kiruhafighter\Downloads\data_lab1,2 1\data_lab1,2\500\norm1.txt");
 
 if (values == null)
 {
@@ -24,3 +24,15 @@ ExcelProcessor.SaveClassesAsHistogram(classIntervals!, variationSeries, FilePath
 var analysisCharacteristics = DataProcessor.EstimateQuantitativeCharacteristics(values);
 
 ExcelProcessor.SaveAsExcel<CharacteristicAnalysisResult, AnalysisResultColumns>(analysisCharacteristics, FilePaths.SaveAnalysisCharacteristicsPath);
+
+var probabilityPlotData = DataProcessor.GenerateProbabilityPlotData(values);
+
+ExcelProcessor.DisplayProbabilityPlotInExcel(probabilityPlotData, FilePaths.SaveProbabilityPlotPath);
+
+var normalDistributionCheck = DataProcessor.IsNormalDistribution(values);
+
+Console.WriteLine($"Is normal distribution: {normalDistributionCheck}");
+
+var anomalies = DataProcessor.DetectAnomalies(values, out double lowerBound, out double upperBound);
+
+ExcelProcessor.DisplayDataWithBoundsInExcel(values, lowerBound, upperBound, FilePaths.SaveDataWithBoundsPath);
